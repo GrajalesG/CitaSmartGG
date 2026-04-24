@@ -11,6 +11,10 @@ app.use(express.json());
 app.use('/api/auth',          require('./routes/auth.routes'));
 app.use('/api/usuarios',      require('./routes/usuarios.routes'));
 app.use('/api/pacientes',     require('./routes/pacientes.routes'));
+app.use('/api/profesionales', require('./routes/profesionales.routes'));
+app.use('/api/servicios',     require('./routes/servicios.routes'));
+app.use('/api/especialidades',require('./routes/especialidades.routes')); 
+app.use('/api/horarios',      require('./routes/horarios.routes'));
 
 
 app.get('/api/health', (_, res) => res.json({ status: 'ok', time: new Date() }));
