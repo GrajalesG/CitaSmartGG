@@ -1,7 +1,9 @@
 const db = require('../config/db');
 
+// Días de la semana
 const DIAS = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 
+//Obtener horarios de un profesional
 const getByProfesional = async (profesionalId) => {
   const [rows] = await db.query(
     `SELECT h.*, p.nombre AS prof_nombre, p.apellido AS prof_apellido
@@ -12,15 +14,16 @@ const getByProfesional = async (profesionalId) => {
   return rows;
 };
 
+// Crear un nuevo horario
 const create = async ({ profesional_id, dia_semana, hora_inicio, hora_fin }) => {
-  // Validar solapamiento en mismo día
+  // Validar solapamiento de horarios
   const [overlap] = await db.query(
     `SELECT id FROM horarios WHERE profesional_id=? AND dia_semana=? AND activo=1
      AND NOT (hora_fin <= ? OR hora_inicio >= ?)`,
     [profesional_id, dia_semana, hora_inicio, hora_fin]
   );
   if (overlap.length) throw { status: 409, message: 'El horario se solapa con uno existente' };
-
+// Registrar horario
   const [r] = await db.query(
     'INSERT INTO horarios (profesional_id, dia_semana, hora_inicio, hora_fin) VALUES (?,?,?,?)',
     [profesional_id, dia_semana, hora_inicio, hora_fin]
@@ -28,7 +31,7 @@ const create = async ({ profesional_id, dia_semana, hora_inicio, hora_fin }) => 
   const [row] = await db.query('SELECT * FROM horarios WHERE id=?', [r.insertId]);
   return row[0];
 };
-
+//Actualizar un horario
 const update = async (id, { hora_inicio, hora_fin, activo }) => {
   const [cur] = await db.query('SELECT * FROM horarios WHERE id=?', [id]);
   if (!cur.length) throw { status: 404, message: 'Horario no encontrado' };
@@ -41,6 +44,7 @@ const update = async (id, { hora_inicio, hora_fin, activo }) => {
   return row[0];
 };
 
+// Eliminar un horario
 const remove = async (id) => {
   await db.query('DELETE FROM horarios WHERE id=?', [id]);
 };
@@ -69,7 +73,7 @@ const getDisponibilidad = async (profesionalId, fecha, duracionMinutos = 30) => 
     [profesionalId, fecha, fecha]
   );
 
-  // 3. Obtener citas del día (no canceladas)
+  // 3. Obtener citas del día 
   const [citas] = await db.query(
     `SELECT fecha_hora_inicio, fecha_hora_fin FROM citas
      WHERE profesional_id=? AND DATE(fecha_hora_inicio)=?
@@ -79,6 +83,7 @@ const getDisponibilidad = async (profesionalId, fecha, duracionMinutos = 30) => 
 
   const slots = [];
 
+  // Generar espacios disponibles
   for (const h of horarios) {
     const [hIni, mIni] = h.hora_inicio.split(':').map(Number);
     const [hFin, mFin] = h.hora_fin.split(':').map(Number);
@@ -113,6 +118,7 @@ const getDisponibilidad = async (profesionalId, fecha, duracionMinutos = 30) => 
   return slots;
 };
 
+// Convertir minutos a formato HH:mm
 const minutesToTime = (m) => {
   const h = String(Math.floor(m / 60)).padStart(2, '0');
   const min = String(m % 60).padStart(2, '0');

@@ -1,12 +1,15 @@
 const router = require('express').Router();
 const svc = require('../services/horarios.service');
-const { verifyToken } = require('../middleware/auth.middleware');
+const { verifyToken, requireRole } = require('../middleware/auth.middleware');
 const { body, query } = require('express-validator');
 const validate = require('../middleware/validate.middleware');
 
+// Solo admin y personal gestionan horarios
+const staffOnly = [verifyToken, requireRole('admin', 'personal')];
+
 const auth = [verifyToken];
 
-// Disponibilidad
+//Consultar disponibilidad de un profesional
 router.get('/disponibilidad',
   [...auth, query('profesional_id').isInt(), query('fecha').isDate(), validate],
   async (req, res, next) => {
@@ -18,13 +21,14 @@ router.get('/disponibilidad',
   }
 );
 
-// Por profesional
-router.get('/profesional/:id', auth, async (req, res, next) => {
+// Obtener horarios de un profesional
+router.get('/profesional/:id', staffOnly, async (req, res, next) => {
   try { res.json({ success: true, data: await svc.getByProfesional(req.params.id) }); } catch (e) { next(e); }
 });
 
+//Crear un horario
 router.post('/',
-  [...auth,
+  [...staffOnly,
     body('profesional_id').isInt(),
     body('dia_semana').isInt({ min: 0, max: 6 }),
     body('hora_inicio').matches(/^\d{2}:\d{2}$/),
@@ -35,8 +39,9 @@ router.post('/',
   }
 );
 
+//Actualizar un horario
 router.put('/:id',
-  [...auth,
+  [...staffOnly,
     body('hora_inicio').matches(/^\d{2}:\d{2}$/),
     body('hora_fin').matches(/^\d{2}:\d{2}$/),
     validate],
@@ -45,7 +50,9 @@ router.put('/:id',
   }
 );
 
-router.delete('/:id', auth, async (req, res, next) => {
+//Eliminar un horario
+
+router.delete('/:id', staffOnly, async (req, res, next) => {
   try { await svc.remove(req.params.id); res.json({ success: true }); } catch (e) { next(e); }
 });
 

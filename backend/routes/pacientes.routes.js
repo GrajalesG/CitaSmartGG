@@ -4,7 +4,10 @@ const ctrl = require('../controllers/pacientes.controller');
 const { verifyToken } = require('../middleware/auth.middleware');
 const validate = require('../middleware/validate.middleware');
 
+//Middleware de autenticación
 const auth = [verifyToken];
+
+//Validaciones para pacientes
 const createValidation = [
   body('nombre').notEmpty().withMessage('Nombre requerido'),
   body('apellido').notEmpty().withMessage('Apellido requerido'),
@@ -12,6 +15,7 @@ const createValidation = [
   validate,
 ];
 
+//Rutas de pacientes CRUD
 router.get('/', auth, ctrl.getAll);
 router.get('/:id', auth, ctrl.getById);
 router.post('/', [...auth, ...createValidation], ctrl.create);

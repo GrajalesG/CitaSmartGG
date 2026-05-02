@@ -12,6 +12,7 @@ const pool = mysql.createPool({
   timezone: '+00:00',
 });
 
+// Verificación de conexión
 pool.getConnection()
   .then(conn => {
     console.log('MySQL conectado');

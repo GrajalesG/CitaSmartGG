@@ -4,6 +4,8 @@ const ctrl = require('../controllers/auth.controller');
 const { verifyToken } = require('../middleware/auth.middleware');
 const validate = require('../middleware/validate.middleware');
 
+// Rutas de autenticación
+//  Iniciar sesión
 router.post('/login',
   [
     body('email').isEmail().withMessage('Email inválido'),
