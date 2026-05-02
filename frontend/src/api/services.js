@@ -1,13 +1,14 @@
 import api from './client';
 
-// AUTH
+// Servicios de autenticación
+// Gestiona inicio de sesión y validación de usuario
 export const authApi = {
   login:  (data) => api.post('/auth/login', data),
   me:     ()     => api.get('/auth/me'),
   logout: ()     => api.post('/auth/logout'),
 };
 
-// USUARIOS
+//Servicios de usuarios
 export const usuariosApi = {
   getAll:   ()       => api.get('/usuarios'),
   getById:  (id)     => api.get(`/usuarios/${id}`),
@@ -17,7 +18,7 @@ export const usuariosApi = {
   getRoles: ()       => api.get('/usuarios/roles'),
 };
 
-// PACIENTES
+//Servicios de pacientes
 export const pacientesApi = {
   getAll:  (search='') => api.get('/pacientes', { params: { search } }),
   getById: (id)        => api.get(`/pacientes/${id}`),
@@ -26,7 +27,7 @@ export const pacientesApi = {
   remove:  (id)        => api.delete(`/pacientes/${id}`),
 };
 
-// PROFESIONALES
+//Servicios de profesionales
 export const profesionalesApi = {
   getAll:  ()      => api.get('/profesionales'),
   getById: (id)    => api.get(`/profesionales/${id}`),
@@ -35,7 +36,7 @@ export const profesionalesApi = {
   remove:  (id)    => api.delete(`/profesionales/${id}`),
 };
 
-// ESPECIALIDADES
+//Servicios de especialidades
 export const especialidadesApi = {
   getAll:  ()      => api.get('/especialidades'),
   create:  (data)  => api.post('/especialidades', data),
@@ -43,7 +44,7 @@ export const especialidadesApi = {
   remove:  (id)    => api.delete(`/especialidades/${id}`),
 };
 
-// SERVICIOS
+//Servicios de servicios médicos
 export const serviciosApi = {
   getAll:  ()      => api.get('/servicios'),
   getById: (id)    => api.get(`/servicios/${id}`),
@@ -52,7 +53,7 @@ export const serviciosApi = {
   remove:  (id)    => api.delete(`/servicios/${id}`),
 };
 
-// HORARIOS
+//Servicios de horarios
 export const horariosApi = {
   getByProfesional: (id)                   => api.get(`/horarios/profesional/${id}`),
   getDisponibilidad:(profesional_id, fecha, duracion) =>
@@ -62,3 +63,21 @@ export const horariosApi = {
   remove: (id)     => api.delete(`/horarios/${id}`),
 };
 
+//Servicios de bloqueos
+export const bloqueosApi = {
+  getByProfesional: (id)   => api.get(`/bloqueos/profesional/${id}`),
+  create:           (data) => api.post('/bloqueos', data),
+  remove:           (id)   => api.delete(`/bloqueos/${id}`),
+};
+
+//Servicios de citas
+export const citasApi = {
+  getAll:       (params)    => api.get('/citas', { params }),
+  getById:      (id)        => api.get(`/citas/${id}`),
+  getCalendario:(params)    => api.get('/citas/calendario', { params }),
+  create:       (data)      => api.post('/citas', data),
+  reprogramar:  (id,data)   => api.put(`/citas/${id}/reprogramar`, data),
+  cancelar:     (id,motivo) => api.patch(`/citas/${id}/cancelar`, { motivo }),
+  confirmar:    (id)        => api.patch(`/citas/${id}/confirmar`),
+  completar:    (id,obs)    => api.patch(`/citas/${id}/completar`, { observaciones: obs }),
+};

@@ -4,22 +4,29 @@ import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
 import logo from '../../assets/logo.png';
 
+//Página de inicio de sesión
+//Permite autenticar usuarios y acceder al sistema.
 export default function LoginPage() {
+  // Función de autenticación desde el contexto
   const { login } = useAuth();
+  // Navegación entre rutas
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
+  //Validación básica del formulario
   const validate = () => {
     const e = {};
+    // Validar email
     if (!form.email) e.email = 'Email requerido';
     else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Email inválido';
+    // Validar contraseña
     if (!form.password) e.password = 'Contraseña requerida';
     setErrors(e);
     return !Object.keys(e).length;
   };
-
+//Envío del formulario
   const handleSubmit = async (ev) => {
     ev.preventDefault();
     if (!validate()) return;
@@ -27,6 +34,7 @@ export default function LoginPage() {
     try {
       await login(form.email, form.password);
       toast.success('Bienvenido');
+      // Redirigir al dashboard
       navigate('/');
     } catch (err) {
       toast.error(err.response?.data?.message || 'Error al iniciar sesión');
@@ -47,7 +55,7 @@ export default function LoginPage() {
           <p className="text-slate-500 text-sm mt-1">Ingresa tus datos para iniciar sesión</p>
         </div>
 
-        {/* Card */}
+        {/* Tarjeta principal */}
         <div className="card p-6 shadow-md">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
@@ -71,7 +79,7 @@ export default function LoginPage() {
               />
               {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
             </div>
-
+            {/* Botón de acceso */}
             <button type="submit" className="btn-primary w-full mt-2" disabled={loading}>
               {loading ? 'Ingresando...' : 'Ingresar'}
             </button>
